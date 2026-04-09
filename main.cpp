@@ -1,16 +1,26 @@
 #include <iostream>
 
+#include "grafica.h"
+
 int main() {
-    int cinco = 5;
-    int *p = &cinco;
-    int *q = &cinco;
+    Grafica fer;
 
-    if (p == q) {
-        std::cout << "SON IGUALES\n";
-    }
+    fer.agregarNodo("a");
+    fer.agregarNodo("b");
+    fer.agregarNodo("c");
+    fer.agregarNodo("d");
 
-    std::cout << "Valor de la variable cinco: " << *p << '\n';
-    std::cout << "Dirección de la variable cinco: " << p << '\n';
-    std::cout << "Dirección de la variable cinco: " << &cinco << '\n';
+    fer.agregarArista("a", "b");
+    fer.agregarArista("b", "c");
+    fer.agregarArista("c", "d");
+    fer.agregarArista("d", "a");
+
+    fer.imprimir();
+
+    fer.eliminarArista("a", "d");
+    fer.agregarArista("a", "d");
+
+    fer.imprimir();
+
 
 }

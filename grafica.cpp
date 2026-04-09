@@ -106,6 +106,7 @@ void Grafica::agregarArista(std::string nodo1, std::string nodo2) {
     }
 }
 
+// ARREGLAR ERROR, NO ACTUALIZA BIEN ultimo_nodo_
 void Grafica::eliminarNodo(std::string nombre) {
     if (estaVacia()) {
         std::cerr << "Error: El la gráfica está vacía.\n";
@@ -154,6 +155,7 @@ void Grafica::eliminarNodo(std::string nombre) {
     }
 }
 
+// ARREGLAR ERROR, NO ACTUALIZA BIEN ultima_arista_
 void Grafica::eliminarArista(std::string nodo1, std::string nodo2) {
     Nodo *puntero = primer_nodo_;
 
@@ -380,3 +382,4 @@ Arista::Arista(Nodo *adyacente, Arista *siguiente /* = nullptr */) {
     siguiente_arista_ = siguiente;
 }
 
+Nodo *buscarDireccion(std::string nodo, Nodo **previo);
