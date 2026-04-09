@@ -12,15 +12,33 @@ class Grafica {
 public:
 
     Grafica();
+    Grafica(const Grafica &graf);
+    ~Grafica();
+
+    Grafica operator=(const Grafica &graf);
 
     void agregarNodo(std::string nombre);
     void agregarArista(std::string nodo1, std::string nodo2);
 
     void eliminarNodo(std::string nombre);
     void eliminarArista(std::string nodo1, std::string nodo2);
-    
+
+    bool buscarNodo(std::string nodo) const;
+    bool buscarArista(std::string nodo1, std::string nodo2) const;
+
+    unsigned int gradoNodo(std::string nodo) const;
+
+    void vaciarNodo(std::string nodo);
+    void vaciarGrafica();
+
+    unsigned int orden() const;
+    unsigned int tamano() const;
+
+    void vaciarNodo();
 
     bool estaVacia() const;
+
+    void imprimir() const;
 
 private:
     unsigned int num_nodos_;
