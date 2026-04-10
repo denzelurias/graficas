@@ -15,7 +15,7 @@ public:
     Grafica(const Grafica &graf);
     ~Grafica();
 
-    Grafica operator=(const Grafica &graf);
+    Grafica& operator=(const Grafica &graf);
 
     void agregarNodo(const std::string &nombre);
     void agregarArista(const std::string &nodo1, const std::string &nodo2);
@@ -26,15 +26,13 @@ public:
     bool buscarNodo(const std::string &nodo) const;
     bool buscarArista(const std::string &nodo1, const std::string &nodo2) const;
 
-    unsigned int gradoNodo(const std::string &nodo) const;
+    int gradoNodo(const std::string &nodo) const;
 
     void vaciarNodo(const std::string &nodo);
     void vaciarGrafica();
 
     unsigned int orden() const;
     unsigned int tamano() const;
-
-    void vaciarNodo();
 
     bool estaVacia() const;
 

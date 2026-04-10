@@ -15,21 +15,47 @@ Grafica::Grafica()
         primer_nodo_{nullptr},
         ultimo_nodo_{nullptr} {}
 
-/*
 Grafica::Grafica(const Grafica &graf) {
-    this =
+    *this = graf;
 }
-*/
 
 Grafica::~Grafica() {
     vaciarGrafica();
 }
 
-Grafica Grafica::operator=(const Grafica &graf) {
+Grafica& Grafica::operator=(const Grafica &graf) {
+    if (this == &graf) return *this;
+    vaciarGrafica();
 
+    Nodo *puntero = graf.primer_nodo_;
+    while (puntero !=nullptr) {
+        agregarNodo(puntero->nombre_nodo_);
+
+        puntero = puntero->siguiente_nodo_;
+    }
+
+    puntero = graf.primer_nodo_;
+    while (puntero !=nullptr) {
+        Arista * puntero_arista = puntero->primera_arista_;
+        while (puntero_arista != nullptr) {
+            if (!buscarArista(puntero->nombre_nodo_, puntero_arista->adyacente_->nombre_nodo_)) {
+                agregarArista(puntero->nombre_nodo_, puntero_arista->adyacente_->nombre_nodo_);
+            }
+
+            puntero_arista = puntero_arista->siguiente_arista_;
+        }
+
+        puntero = puntero->siguiente_nodo_;
+    }
+
+    return *this;
 }
 
 void Grafica::agregarNodo(const std::string &nombre) {
+    if (buscarNodo(nombre)) {
+        std::cerr << "Error: Nodo ya existente.\n";
+        return;
+    }
     try {
         Nodo *nuevo_nodo = new Nodo(nombre);
 
@@ -49,6 +75,10 @@ void Grafica::agregarNodo(const std::string &nombre) {
 }
 
 void Grafica::agregarArista(const std::string &nodo1, const std::string &nodo2) {
+    if (buscarArista(nodo1, nodo2)) {
+        std::cerr << "Error: Arista ya existente.\n";
+        return;
+    }
     try {
         Nodo *puntero = primer_nodo_;
 
@@ -97,6 +127,7 @@ void Grafica::agregarArista(const std::string &nodo1, const std::string &nodo2) 
             aux_dos->ultima_arista_ = nueva_arista_dos;
         }
 
+        ++num_aristas_;
         ++aux_uno->grado_nodo_;
         ++aux_dos->grado_nodo_;
 
@@ -106,7 +137,6 @@ void Grafica::agregarArista(const std::string &nodo1, const std::string &nodo2) 
     }
 }
 
-// ARREGLAR ERROR, NO ACTUALIZA BIEN ultimo_nodo_
 void Grafica::eliminarNodo(const std::string &nombre) {
     if (estaVacia()) {
         std::cerr << "Error: El la gráfica está vacía.\n";
@@ -163,7 +193,6 @@ void Grafica::eliminarNodo(const std::string &nombre) {
     }
 }
 
-// ARREGLAR ERROR, NO ACTUALIZA BIEN ultima_arista_
 void Grafica::eliminarArista(const std::string &nodo1, const std::string &nodo2) {
     Nodo *puntero = primer_nodo_;
 
@@ -201,6 +230,11 @@ void Grafica::eliminarArista(const std::string &nodo1, const std::string &nodo2)
     if (aux_uno->primera_arista_->adyacente_->nombre_nodo_ == aux_dos->nombre_nodo_) {
         porBorrar = aux_uno->primera_arista_;
         aux_uno->primera_arista_ = porBorrar->siguiente_arista_;
+
+        if (porBorrar == aux_uno->ultima_arista_) {
+            aux_uno->ultima_arista_ = nullptr;
+        }
+
         delete porBorrar;
     }
     else {
@@ -211,6 +245,11 @@ void Grafica::eliminarArista(const std::string &nodo1, const std::string &nodo2)
         while (porBorrar != nullptr) {
             if (porBorrar->adyacente_->nombre_nodo_ == aux_dos->nombre_nodo_) {
                 anterior->siguiente_arista_ = porBorrar->siguiente_arista_;
+
+                if (porBorrar == aux_uno->ultima_arista_) {
+                    aux_uno->ultima_arista_ = anterior;
+                }
+
                 delete porBorrar;
                 break;
             }
@@ -228,6 +267,11 @@ void Grafica::eliminarArista(const std::string &nodo1, const std::string &nodo2)
     if (aux_dos->primera_arista_->adyacente_->nombre_nodo_ == aux_uno->nombre_nodo_) {
         porBorrar = aux_dos->primera_arista_;
         aux_dos->primera_arista_ = porBorrar->siguiente_arista_;
+
+        if (porBorrar == aux_dos->ultima_arista_) {
+            aux_dos->ultima_arista_ = nullptr;
+        }
+
         delete porBorrar;
     }
     else {
@@ -238,6 +282,11 @@ void Grafica::eliminarArista(const std::string &nodo1, const std::string &nodo2)
         while (porBorrar != nullptr) {
             if (porBorrar->adyacente_->nombre_nodo_ == aux_uno->nombre_nodo_) {
                 anterior->siguiente_arista_ = porBorrar->siguiente_arista_;
+
+                if (porBorrar == aux_dos->ultima_arista_) {
+                    aux_dos->ultima_arista_ = anterior;
+                }
+
                 delete porBorrar;
                 break;
             }
@@ -246,6 +295,11 @@ void Grafica::eliminarArista(const std::string &nodo1, const std::string &nodo2)
             porBorrar = anterior->siguiente_arista_;
         }
     }
+
+    // Actualizamos contadores
+    --num_aristas_;
+    --aux_uno->grado_nodo_;
+    --aux_dos->grado_nodo_;
 }
 
 bool Grafica::buscarNodo(const std::string &nodo) const {
@@ -298,7 +352,7 @@ bool Grafica::buscarArista(const std::string &nodo1, const std::string &nodo2) c
     return false;
 }
 
-unsigned int Grafica::gradoNodo(const std::string &nodo) const {
+int Grafica::gradoNodo(const std::string &nodo) const {
     Nodo *puntero = primer_nodo_;
 
     while (puntero != nullptr) {
@@ -389,5 +443,3 @@ Arista::Arista(Nodo *adyacente, Arista *siguiente /* = nullptr */) {
     adyacente_ = adyacente;
     siguiente_arista_ = siguiente;
 }
-
-Nodo *buscarDireccion(std::string nodo, Nodo **previo);
