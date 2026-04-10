@@ -16,11 +16,16 @@ int main() {
     fer.agregarArista("d", "a");
 
     fer.imprimir();
+    std::cout << '\n';
 
-    fer.eliminarArista("a", "d");
-    fer.agregarArista("a", "d");
+    fer.eliminarNodo("d");
 
     fer.imprimir();
+    std::cout << '\n';
 
+    fer.agregarNodo("d");
+
+    fer.imprimir();
+    std::cout << '\n';
 
 }
