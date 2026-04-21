@@ -19,13 +19,11 @@ int main() {
     std::cout << '\n';
 
     fer.eliminarNodo("d");
-
-    fer.imprimir();
-    std::cout << '\n';
-
     fer.agregarNodo("d");
 
     fer.imprimir();
     std::cout << '\n';
+
+    fer.agregarNodo("a");
 
 }
