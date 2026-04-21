@@ -5,6 +5,7 @@
 #include "grafica.h"
 
 #include <iostream>
+#include <limits>
 
 namespace {
 
@@ -29,6 +30,22 @@ const Nodo *buscarNodoPtr(const Nodo *primer_nodo, const std::string &nombre) {
             return puntero;
         }
         puntero = puntero->siguiente_nodo_;
+    }
+
+    return nullptr;
+}
+
+const Arista *buscarAristaPtr(const Nodo *origen, const Nodo *destino) {
+    if (origen == nullptr || destino == nullptr) {
+        return nullptr;
+    }
+
+    const Arista *puntero = origen->primera_arista_;
+    while (puntero != nullptr) {
+        if (puntero->adyacente_ == destino) {
+            return puntero;
+        }
+        puntero = puntero->siguiente_arista_;
     }
 
     return nullptr;
@@ -121,7 +138,9 @@ Grafica& Grafica::operator=(const Grafica &graf) {
         Arista * puntero_arista = puntero->primera_arista_;
         while (puntero_arista != nullptr) {
             if (!buscarArista(puntero->nombre_nodo_, puntero_arista->adyacente_->nombre_nodo_)) {
-                agregarArista(puntero->nombre_nodo_, puntero_arista->adyacente_->nombre_nodo_);
+                agregarArista(puntero->nombre_nodo_,
+                              puntero_arista->adyacente_->nombre_nodo_,
+                              puntero_arista->peso_);
             }
 
             puntero_arista = puntero_arista->siguiente_arista_;
@@ -156,6 +175,10 @@ void Grafica::agregarNodo(const std::string &nombre) {
 }
 
 void Grafica::agregarArista(const std::string &nodo1, const std::string &nodo2) {
+    agregarArista(nodo1, nodo2, 1.0);
+}
+
+void Grafica::agregarArista(const std::string &nodo1, const std::string &nodo2, double peso) {
     if (buscarArista(nodo1, nodo2)) {
         return;
     }
@@ -171,8 +194,8 @@ void Grafica::agregarArista(const std::string &nodo1, const std::string &nodo2) 
     Arista *nueva_arista_dos = nullptr;
 
     try {
-        nueva_arista = new Arista(aux_dos);
-        nueva_arista_dos = new Arista(aux_uno);
+        nueva_arista = new Arista(aux_dos, peso);
+        nueva_arista_dos = new Arista(aux_uno, peso);
     } catch (const std::bad_alloc &mensaje) {
         delete nueva_arista;
         delete nueva_arista_dos;
@@ -297,20 +320,19 @@ bool Grafica::buscarArista(const std::string &nodo1, const std::string &nodo2) c
     const Nodo *aux_uno = buscarNodoPtr(static_cast<const Nodo *>(primer_nodo_), nodo1);
     const Nodo *aux_dos = buscarNodoPtr(static_cast<const Nodo *>(primer_nodo_), nodo2);
 
-    if (aux_uno == nullptr || aux_dos == nullptr) {
-        return false;
+    return buscarAristaPtr(aux_uno, aux_dos) != nullptr;
+}
+
+double Grafica::pesoArista(const std::string &nodo1, const std::string &nodo2) const {
+    const Nodo *aux_uno = buscarNodoPtr(static_cast<const Nodo *>(primer_nodo_), nodo1);
+    const Nodo *aux_dos = buscarNodoPtr(static_cast<const Nodo *>(primer_nodo_), nodo2);
+    const Arista *arista = buscarAristaPtr(aux_uno, aux_dos);
+
+    if (arista == nullptr) {
+        return -1.0;
     }
 
-    const Arista *puntero_arista = aux_uno->primera_arista_;
-
-    while (puntero_arista != nullptr) {
-        if (puntero_arista->adyacente_ == aux_dos) {
-            return true;
-        }
-        puntero_arista = puntero_arista->siguiente_arista_;
-    }
-
-    return false;
+    return arista->peso_;
 }
 
 int Grafica::gradoNodo(const std::string &nodo) const {
@@ -365,7 +387,8 @@ void Grafica::imprimir() const {
                     std::cout << ", ";
                 }
 
-                std::cout << puntero_arista->adyacente_->nombre_nodo_;
+                std::cout << puntero_arista->adyacente_->nombre_nodo_
+                          << '(' << puntero_arista->peso_ << ')';
                 primera_salida = false;
             }
 
@@ -379,6 +402,55 @@ void Grafica::imprimir() const {
 
         puntero = puntero->siguiente_nodo_;
     }
+}
+
+Grafica Grafica::arbolMinimaExpansionPrim() const {
+    Grafica arbol;
+
+    if (estaVacia()) {
+        return arbol;
+    }
+
+    arbol.agregarNodo(primer_nodo_->nombre_nodo_);
+
+    while (arbol.orden() < orden()) {
+        const Nodo *mejor_origen = nullptr;
+        const Nodo *mejor_destino = nullptr;
+        double mejor_peso = std::numeric_limits<double>::infinity();
+
+        const Nodo *puntero = primer_nodo_;
+        while (puntero != nullptr) {
+            if (!arbol.buscarNodo(puntero->nombre_nodo_)) {
+                puntero = puntero->siguiente_nodo_;
+                continue;
+            }
+
+            const Arista *arista = puntero->primera_arista_;
+            while (arista != nullptr) {
+                if (arista->adyacente_ != puntero &&
+                    !arbol.buscarNodo(arista->adyacente_->nombre_nodo_) &&
+                    arista->peso_ < mejor_peso) {
+                    mejor_origen = puntero;
+                    mejor_destino = arista->adyacente_;
+                    mejor_peso = arista->peso_;
+                }
+
+                arista = arista->siguiente_arista_;
+            }
+
+            puntero = puntero->siguiente_nodo_;
+        }
+
+        if (mejor_origen == nullptr || mejor_destino == nullptr) {
+            arbol.vaciarGrafica();
+            return arbol;
+        }
+
+        arbol.agregarNodo(mejor_destino->nombre_nodo_);
+        arbol.agregarArista(mejor_origen->nombre_nodo_, mejor_destino->nombre_nodo_, mejor_peso);
+    }
+
+    return arbol;
 }
 
 void Grafica::vaciarGrafica() {
@@ -403,7 +475,8 @@ Nodo::Nodo(std::string nombre, Nodo * siguiente /* = nullptr */) {
 // Arista
 //----------------------------------------------------------------------
 
-Arista::Arista(Nodo *adyacente, Arista *siguiente /* = nullptr */) {
+Arista::Arista(Nodo *adyacente, double peso, Arista *siguiente /* = nullptr */) {
     adyacente_ = adyacente;
+    peso_ = peso;
     siguiente_arista_ = siguiente;
 }

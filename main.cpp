@@ -3,27 +3,45 @@
 #include "grafica.h"
 
 int main() {
-    Grafica fer;
+    Grafica grafica;
 
-    fer.agregarNodo("a");
-    fer.agregarNodo("b");
-    fer.agregarNodo("c");
-    fer.agregarNodo("d");
+    grafica.agregarNodo("A");
+    grafica.agregarNodo("B");
+    grafica.agregarNodo("C");
+    grafica.agregarNodo("D");
+    grafica.agregarNodo("E");
+    grafica.agregarNodo("F");
+    grafica.agregarNodo("G");
 
-    fer.agregarArista("a", "b");
-    fer.agregarArista("b", "c");
-    fer.agregarArista("c", "d");
-    fer.agregarArista("d", "a");
+    grafica.agregarArista("A", "B", 7.0);
+    grafica.agregarArista("A", "D", 5.0);
+    grafica.agregarArista("B", "C", 8.0);
+    grafica.agregarArista("B", "D", 9.0);
+    grafica.agregarArista("B", "E", 7.0);
+    grafica.agregarArista("C", "E", 5.0);
+    grafica.agregarArista("D", "E", 15.0);
+    grafica.agregarArista("D", "F", 6.0);
+    grafica.agregarArista("E", "F", 8.0);
+    grafica.agregarArista("E", "G", 9.0);
+    grafica.agregarArista("F", "G", 11.0);
 
-    fer.imprimir();
+    std::cout << "Grafica original:\n";
+    grafica.imprimir();
     std::cout << '\n';
 
-    fer.eliminarNodo("d");
-    fer.agregarNodo("d");
+    Grafica arbol = grafica.arbolMinimaExpansionPrim();
 
-    fer.imprimir();
+    std::cout << "Arbol de minima expansion (Prim):\n";
+    if (arbol.estaVacia()) {
+        std::cout << "La grafica no es conexa.\n";
+        return 0;
+    }
+
+    arbol.imprimir();
     std::cout << '\n';
 
-    fer.agregarNodo("a");
+    std::cout << "Orden: " << arbol.orden() << '\n';
+    std::cout << "Tamano: " << arbol.tamano() << '\n';
 
+    return 0;
 }

@@ -13,6 +13,7 @@ public:
     // Grafica no dirigida con listas enlazadas.
     // Soporta lazos: un lazo cuenta como una arista y aporta grado 2.
     // En imprimir(), cada lazo se muestra una sola vez.
+    // Las aristas tienen peso double; agregarArista sin peso usa 1.0.
     Grafica();
     Grafica(const Grafica &graf);
     ~Grafica();
@@ -21,12 +22,14 @@ public:
 
     void agregarNodo(const std::string &nombre);
     void agregarArista(const std::string &nodo1, const std::string &nodo2);
+    void agregarArista(const std::string &nodo1, const std::string &nodo2, double peso);
 
     void eliminarNodo(const std::string &nombre);
     void eliminarArista(const std::string &nodo1, const std::string &nodo2);
 
     bool buscarNodo(const std::string &nodo) const;
     bool buscarArista(const std::string &nodo1, const std::string &nodo2) const;
+    double pesoArista(const std::string &nodo1, const std::string &nodo2) const;
 
     // Regresa -1 si el nodo no existe.
     int gradoNodo(const std::string &nodo) const;
@@ -40,6 +43,7 @@ public:
     bool estaVacia() const;
 
     void imprimir() const;
+    Grafica arbolMinimaExpansionPrim() const;
 
 private:
     unsigned int num_nodos_;
@@ -65,10 +69,11 @@ struct Nodo {
 
 struct Arista {
     Nodo *adyacente_;
+    double peso_;
 
     Arista *siguiente_arista_;
 
-    Arista(Nodo *adyacente, Arista *siguiente = nullptr);
+    Arista(Nodo *adyacente, double peso = 1.0, Arista *siguiente = nullptr);
 };
 
 
