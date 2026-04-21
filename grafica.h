@@ -10,9 +10,7 @@
 struct Nodo;
 class Grafica {
 public:
-    // Grafica no dirigida con listas enlazadas.
-    // Soporta lazos: un lazo cuenta como una arista y aporta grado 2.
-    // En imprimir(), cada lazo se muestra una sola vez.
+
     Grafica();
     Grafica(const Grafica &graf);
     ~Grafica();
@@ -28,7 +26,6 @@ public:
     bool buscarNodo(const std::string &nodo) const;
     bool buscarArista(const std::string &nodo1, const std::string &nodo2) const;
 
-    // Regresa -1 si el nodo no existe.
     int gradoNodo(const std::string &nodo) const;
 
     void vaciarNodo(const std::string &nodo);
